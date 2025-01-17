@@ -2,7 +2,7 @@ from tkinter import *
 import math
 
 logs = Tk()
-logs.title("Swedbank krājrīks")
+logs.title("Swedbank krājrīka kaukulātors")
 logs.geometry("1000x600")
 
 swedbank_interest = 2.5
@@ -59,7 +59,7 @@ procenta_summa_value.pack(pady=20)
 ikmenesa_iemaksa = Label(right_frame, text="Manas Iemaksas", font=("Arial", 16))
 ikmenesa_iemaksa.pack(pady=20)
 
-ikmenesa_iemaksa_value = Label(logs, text="0", font=("Arial", 16))
+ikmenesa_iemaksa_value = Label(right_frame, text="0", font=("Arial", 16))
 ikmenesa_iemaksa_value.pack(pady=20)
 
 logs.mainloop()
