@@ -10,11 +10,9 @@ Krājkonts = {"Swedbank": 0}
 Transaction_history = []
 
 def add_to_history(account, amount):
-    timestamp = logs.after(0, lambda: None) 
     transaction_record = {
         "account": account,
         "amount": amount,
-        "timestamp": timestamp
     }
     Transaction_history.append(transaction_record)
     update_history_display()
@@ -26,25 +24,33 @@ def update_history_display():
         history_text.insert(END, f"{record['account']}: {amount_text}\n")
 
 def transaction(konts):
+    krājkonts = konts+ " krājkonts"
     try:
         transaction = float(transaction_entry.get())
+
         if transaction < 0:
+            decimal = round(abs(transaction - math.floor(transaction)), 2)
+
             if abs(transaction) > Konts[konts]:
                 status_label.config(text="Transaction failed: Insufficient funds", fg="red")
                 return
-            decimal = round(abs(transaction - math.floor(transaction)), 2)
+
             if decimal == 0:
                 Konts[konts] += transaction
                 add_to_history(konts, transaction)
                 transaction_value.config(text=f"{konts} {Konts[konts]} €")
                 status_label.config(text="Transaction successful", fg="green")
+
             else:
                 Krājkonts[konts] = round(Krājkonts[konts] + decimal, 2)
                 Konts[konts] += (transaction - decimal)
                 add_to_history(konts, transaction)
+                add_to_history(konts, -decimal)
+                add_to_history(krājkonts, decimal)
                 transaction_value.config(text=f"{konts} {Konts[konts]} €")
                 krājkonts_value.config(text=f"{konts} krājkonts: {Krājkonts[konts]} €")
                 status_label.config(text="Transaction successful", fg="green")
+                
         else:
             Konts[konts] += transaction
             add_to_history(konts, transaction)
