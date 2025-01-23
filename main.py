@@ -1,35 +1,59 @@
 from tkinter import *
 import math
+
 logs = Tk()
 logs.title("Swedbank")
 logs.geometry("1000x600")
 
 Konts =  {"Swedbank": 1000}
-Krājkonts = {"Swedbank": 1000}
+Krājkonts = {"Swedbank": 0}
+Transaction_history = []
+
+def add_to_history(account, amount):
+    timestamp = logs.after(0, lambda: None) 
+    transaction_record = {
+        "account": account,
+        "amount": amount,
+        "timestamp": timestamp
+    }
+    Transaction_history.append(transaction_record)
+    update_history_display()
+
+def update_history_display():
+    history_text.delete(1.0, END)
+    for record in reversed(Transaction_history):
+        amount_text = f"{record['amount']:+.2f} €"
+        history_text.insert(END, f"{record['account']}: {amount_text}\n")
 
 def transaction(konts):
-    transaction = float(transaction_entry.get())
-    print(f"transaction: {Konts[konts]}: {transaction} {konts}")
-    if transaction < 0:
-        decimal = transaction - math.floor(transaction)
-        if decimal == 0:
-            Konts[konts] += transaction
-            transaction_value.config(text=f"{konts} " + str(Konts[konts]) + " €")
-            
+    try:
+        transaction = float(transaction_entry.get())
+        if transaction < 0:
+            if abs(transaction) > Konts[konts]:
+                status_label.config(text="Transaction failed: Insufficient funds", fg="red")
+                return
+            decimal = round(abs(transaction - math.floor(transaction)), 2)
+            if decimal == 0:
+                Konts[konts] += transaction
+                add_to_history(konts, transaction)
+                transaction_value.config(text=f"{konts} {Konts[konts]} €")
+                status_label.config(text="Transaction successful", fg="green")
+            else:
+                Krājkonts[konts] = round(Krājkonts[konts] + decimal, 2)
+                Konts[konts] += (transaction - decimal)
+                add_to_history(konts, transaction)
+                transaction_value.config(text=f"{konts} {Konts[konts]} €")
+                krājkonts_value.config(text=f"{konts} krājkonts: {Krājkonts[konts]} €")
+                status_label.config(text="Transaction successful", fg="green")
         else:
-            Krājkonts[konts] += decimal
-            Konts[konts] += (transaction - decimal)
-            print(Krājkonts[konts])
-            transaction_value.config(text=f"{konts} " + str(Konts[konts]) + " €")
-            krājkonts_value.config(text=f"{konts} krājkonts: " + str(Krājkonts[konts]) + " €")
+            Konts[konts] += transaction
+            add_to_history(konts, transaction)
+            transaction_value.config(text=f"{konts} {Konts[konts]} €")
+            status_label.config(text="Transaction successful", fg="green")
             
-    
-        
-        print(Konts[konts])
-        
-    else:
-        Konts[konts] += transaction
-        transaction_value.config(text=f"{konts} " +str(Konts[konts]) + " €")
+        transaction_entry.delete(0, END)
+    except ValueError:
+        status_label.config(text="Invalid amount entered", fg="red")
 
 main_frame = Frame(logs)
 main_frame.pack(fill="both", expand=True)
@@ -49,6 +73,18 @@ transaction_value = Label(right_frame, text="0 €", font=("Arial", 16))
 transaction_value.pack(pady=20)
 
 krājkonts_value = Label(right_frame, text="0 €", font=("Arial", 16))
-krājkonts_value.pack(pady=20)   
+krājkonts_value.pack(pady=20)
+
+status_label = Label(left_frame, text="", font=("Arial", 12))
+status_label.pack(pady=10)
+
+history_frame = Frame(right_frame)
+history_frame.pack(fill="both", expand=True, pady=20)
+
+history_label = Label(history_frame, text="Transaction History", font=("Arial", 14, "bold"))
+history_label.pack()
+
+history_text = Text(history_frame, font=("Arial", 12), height=10, width=40)
+history_text.pack(pady=10)
 
 logs.mainloop()
