@@ -6,7 +6,10 @@ logs.title("Swedbank")
 logs.geometry("1000x600")
 
 Konts =  {"Swedbank": 1000}
-Krājkonts = {"Swedbank": 0}
+Krājkonts = {}
+for account in Konts:
+    Krājkonts[account + " krājkonts"] = 0
+
 Transaction_history = []
 
 def add_to_history(account, amount):
@@ -24,7 +27,7 @@ def update_history_display():
         history_text.insert(END, f"{record['account']}: {amount_text}\n")
 
 def transaction(konts):
-    krājkonts = konts+ " krājkonts"
+    krājkonts = konts + " krājkonts"
     try:
         transaction = float(transaction_entry.get())
 
@@ -42,15 +45,15 @@ def transaction(konts):
                 status_label.config(text="Transaction successful", fg="green")
 
             else:
-                Krājkonts[konts] = round(Krājkonts[konts] + decimal, 2)
+                Krājkonts[krājkonts] = round(Krājkonts[krājkonts] + decimal, 2)
                 Konts[konts] += (transaction - decimal)
                 add_to_history(konts, transaction)
                 add_to_history(konts, -decimal)
                 add_to_history(krājkonts, decimal)
                 transaction_value.config(text=f"{konts} {Konts[konts]} €")
-                krājkonts_value.config(text=f"{konts} krājkonts: {Krājkonts[konts]} €")
+                krājkonts_value.config(text=f"{krājkonts} : {Krājkonts[krājkonts]} €")
                 status_label.config(text="Transaction successful", fg="green")
-                
+
         else:
             Konts[konts] += transaction
             add_to_history(konts, transaction)
@@ -70,22 +73,27 @@ right_frame = Frame(main_frame)
 right_frame.pack(side="right", fill="both", expand=True)
 
 transaction_entry = Entry(left_frame, font=("Arial", 16))
-transaction_entry.pack(pady=20)
+transaction_entry.pack(pady=10)
 
-transaction_button = Button(left_frame, text="Jauns darijums", font=("Arial", 16), command=lambda: transaction("Swedbank"))
-transaction_button.pack(pady=20)
+transaction_button = Button(left_frame, text="Jauns darijums", font=("Arial", 16), command=lambda: transaction(transaction_from.get()))
+transaction_button.pack(pady=10)
 
 transaction_value = Label(right_frame, text="0 €", font=("Arial", 16))
-transaction_value.pack(pady=20)
+transaction_value.pack(pady=10)
 
 krājkonts_value = Label(right_frame, text="0 €", font=("Arial", 16))
-krājkonts_value.pack(pady=20)
+krājkonts_value.pack(pady=10)
 
-status_label = Label(left_frame, text="", font=("Arial", 12))
+status_label = Label(left_frame, text="There has been no transaction yet", font=("Arial", 12))
 status_label.pack(pady=10)
 
+transaction_from = StringVar(logs)
+transaction_from.set("Izvēlies kontu, no kā taisīt darijumu")
+transaction_from_menu = OptionMenu(left_frame, transaction_from, *Konts)
+transaction_from_menu.pack(pady=10)
+
 history_frame = Frame(right_frame)
-history_frame.pack(fill="both", expand=True, pady=20)
+history_frame.pack(fill="both", expand=True, pady=10)
 
 history_label = Label(history_frame, text="Transaction History", font=("Arial", 14, "bold"))
 history_label.pack()
