@@ -34,8 +34,8 @@ def load_accounts():
             Krājkonts = data["krajkonts"]
             Transaction_history = data["transactions"]
     except (FileNotFoundError, json.JSONDecodeError):
-        Konts = {"LV16HABA0551052320753": 22.20}
-        Krājkonts = {"LV59HABA0552060057732": 990.24}
+        Konts = {"No account found": 0}
+        Krājkonts = {"No savings account found": 0}
         Transaction_history = []
         save_accounts()
 
@@ -107,7 +107,7 @@ class OverviewView(View):
         Label(exp_header, text="Detailed view", font=('Arial', 12), bg='white', fg='#007AFF').pack(side=RIGHT)
         
         Label(expenses_frame, text="This month", font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
-        Label(expenses_frame, text="189.22 EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+        Label(expenses_frame, text="0 EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
 
 class AccountView(View):
     def __init__(self, parent, account_number):
@@ -146,6 +146,95 @@ class AccountView(View):
                 color = "green" if amount > 0 else "red"
                 Label(trans_item, text=f"{amount:+.2f} EUR", fg=color, bg='white').pack(anchor=W)
 
+class TransfersView(View):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setup_ui()
+
+    def setup_ui(self):
+        header = Frame(self, bg='white')
+        header.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(header, text="Transfers", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+
+        from_frame = Frame(self, bg='white')
+        from_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(from_frame, text="From Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.from_var = StringVar(self)
+        accounts = list(Konts.keys()) + list(Krājkonts.keys())
+        if accounts:
+            self.from_var.set(accounts[0])
+        from_menu = OptionMenu(from_frame, self.from_var, *accounts)
+        from_menu.config(bg='white', bd=1, relief=SOLID)
+        from_menu.pack(fill=X, pady=(5,0))
+
+        to_frame = Frame(self, bg='white')
+        to_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(to_frame, text="To Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.to_var = StringVar(self)
+        if len(accounts) > 1:
+            self.to_var.set(accounts[1])
+        else:
+            self.to_var.set(accounts[0])
+        to_menu = OptionMenu(to_frame, self.to_var, *accounts)
+        to_menu.config(bg='white', bd=1, relief=SOLID)
+        to_menu.pack(fill=X, pady=(5,0))
+
+        amount_frame = Frame(self, bg='white')
+        amount_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(amount_frame, text="Amount (EUR)", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.amount_entry = Entry(amount_frame, font=('Arial', 16), bd=1, relief=SOLID)
+        self.amount_entry.pack(fill=X, pady=(5,0))
+
+        button_frame = Frame(self, bg='white')
+        button_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        self.status_label = Label(button_frame, text="", font=('Arial', 12), bg='white')
+        self.status_label.pack(pady=(0,10))
+        
+        transfer_button = Button(button_frame, text="Transfer", font=('Arial', 14), 
+                               bg='#FF6600', fg='white', bd=0,
+                               command=self.make_transfer)
+        transfer_button.pack(fill=X, ipady=10)
+
+    def make_transfer(self):
+        from_acc = self.from_var.get()
+        to_acc = self.to_var.get()
+        
+        try:
+            amount = float(self.amount_entry.get())
+            if amount <= 0:
+                self.status_label.config(text="Please enter a positive amount", fg='red')
+                return
+                
+            if from_acc == to_acc:
+                self.status_label.config(text="Cannot transfer to the same account", fg='red')
+                return
+
+            from_dict = Konts if from_acc in Konts else Krājkonts
+            to_dict = Konts if to_acc in Konts else Krājkonts
+            
+            if from_dict[from_acc] < amount:
+                self.status_label.config(text="Insufficient funds", fg='red')
+                return
+            
+            from_dict[from_acc] -= amount
+            to_dict[to_acc] += amount
+            
+            add_transaction(from_acc, -amount, f"Transfer to {to_acc}")
+            add_transaction(to_acc, amount, f"Transfer from {from_acc}")
+            
+            self.amount_entry.delete(0, END)
+            self.status_label.config(text="Transfer successful", fg='green')
+            
+            save_accounts()
+            
+        except ValueError:
+            self.status_label.config(text="Please enter a valid amount", fg='red')
+
 def show_overview():
     global current_view
     if current_view:
@@ -160,19 +249,26 @@ def show_account(account_number):
     current_view = AccountView(root, account_number)
     current_view.pack(fill=BOTH, expand=True)
 
+def show_transfers():
+    global current_view
+    if current_view:
+        current_view.pack_forget()
+    current_view = TransfersView(root)
+    current_view.pack(fill=BOTH, expand=True)
+
 nav_bar = Frame(root, bg='#F8F8F8', height=50)
 nav_bar.pack(side=BOTTOM, fill=X)
 
 nav_items = [
-    ("Overview", "overview.png"),
-    ("Transfers", "transfers.png"),
-    ("Cards", "cards.png"),
-    ("Services", "services.png"),
-    ("Contacts", "contacts.png")
+    ("Overview", "overview.png", show_overview),
+    ("Transfers", "transfers.png", show_transfers),
+    ("Cards", "cards.png", lambda: None),
+    ("Services", "services.png", lambda: None),
+    ("Contacts", "contacts.png", lambda: None)
 ]
 
-for text, icon in nav_items:
-    btn = Button(nav_bar, text=text, bg='#F8F8F8', bd=0)
+for text, icon, command in nav_items:
+    btn = Button(nav_bar, text=text, bg='#F8F8F8', bd=0, command=command)
     btn.pack(side=LEFT, expand=True, pady=10)
 
 show_overview()

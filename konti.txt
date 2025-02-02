@@ -8,6 +8,54 @@
     "transactions": [
         {
             "account": "Swedbank",
+            "amount": 100.0,
+            "date": "02/02/2025, 13:48",
+            "description": "Transfer from Swedbank kr\u0101jkonts"
+        },
+        {
+            "account": "Swedbank kr\u0101jkonts",
+            "amount": -100.0,
+            "date": "02/02/2025, 13:48",
+            "description": "Transfer to Swedbank"
+        },
+        {
+            "account": "Swedbank kr\u0101jkonts",
+            "amount": 100.0,
+            "date": "02/02/2025, 13:48",
+            "description": "Transfer from Swedbank"
+        },
+        {
+            "account": "Swedbank",
+            "amount": -100.0,
+            "date": "02/02/2025, 13:48",
+            "description": "Transfer to Swedbank kr\u0101jkonts"
+        },
+        {
+            "account": "Swedbank",
+            "amount": 100.0,
+            "date": "02/02/2025, 13:47",
+            "description": "Transfer from Swedbank kr\u0101jkonts"
+        },
+        {
+            "account": "Swedbank kr\u0101jkonts",
+            "amount": -100.0,
+            "date": "02/02/2025, 13:47",
+            "description": "Transfer to Swedbank"
+        },
+        {
+            "account": "Swedbank kr\u0101jkonts",
+            "amount": 100.0,
+            "date": "02/02/2025, 13:47",
+            "description": "Transfer from Swedbank"
+        },
+        {
+            "account": "Swedbank",
+            "amount": -100.0,
+            "date": "02/02/2025, 13:47",
+            "description": "Transfer to Swedbank kr\u0101jkonts"
+        },
+        {
+            "account": "Swedbank",
             "amount": 10.0
         },
         {
