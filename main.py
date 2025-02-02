@@ -72,15 +72,31 @@ class OverviewView(View):
         account_frame.pack(fill=X, padx=20, pady=(20,0))
         
         for acc_num, balance in Konts.items():
-            Label(account_frame, text=acc_num, font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
-            Label(account_frame, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+            account_button = Frame(account_frame, bg='white', cursor='hand2')
+            account_button.pack(fill=X, pady=5)
+            account_button.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
+            
+            Label(account_button, text=acc_num, font=('Arial', 12), bg='white', fg='gray', cursor='hand2').pack(anchor=W)
+            Label(account_button, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white', cursor='hand2').pack(anchor=W)
+            
+            for widget in account_button.winfo_children():
+                widget.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
         
         savings_frame = Frame(self, bg='white')
         savings_frame.pack(fill=X, padx=20, pady=(20,0))
         
         Label(savings_frame, text="Savings", font=('Arial', 16), bg='white').pack(anchor=W)
+        
         for acc_num, balance in Krājkonts.items():
-            Label(savings_frame, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+            savings_button = Frame(savings_frame, bg='white', cursor='hand2')
+            savings_button.pack(fill=X, pady=5)
+            savings_button.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
+            
+            Label(savings_button, text=acc_num, font=('Arial', 12), bg='white', fg='gray', cursor='hand2').pack(anchor=W)
+            Label(savings_button, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white', cursor='hand2').pack(anchor=W)
+            
+            for widget in savings_button.winfo_children():
+                widget.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
         
         expenses_frame = Frame(self, bg='white')
         expenses_frame.pack(fill=X, padx=20, pady=(20,0))
@@ -109,7 +125,7 @@ class AccountView(View):
         balance_frame = Frame(self, bg='white')
         balance_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        balance = Konts.get(self.account_number, 0)
+        balance = Konts.get(self.account_number, 0) if self.account_number in Konts else Krājkonts.get(self.account_number, 0)
         Label(balance_frame, text=f"{balance:.2f}", font=('Arial', 36, 'bold'), bg='white').pack(anchor=W)
         Label(balance_frame, text="EUR", font=('Arial', 16), bg='white').pack(anchor=W)
 
