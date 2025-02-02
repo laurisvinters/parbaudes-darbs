@@ -1,0 +1,30 @@
+{
+    "konts": {
+        "Swedbank": 1019.0
+    },
+    "krajkonts": {
+        "Swedbank kr\u0101jkonts": 0.5
+    },
+    "transactions": [
+        {
+            "account": "Swedbank",
+            "amount": 10.0
+        },
+        {
+            "account": "Swedbank",
+            "amount": 20.0
+        },
+        {
+            "account": "Swedbank",
+            "amount": -10.5
+        },
+        {
+            "account": "Swedbank",
+            "amount": -0.5
+        },
+        {
+            "account": "Swedbank kr\u0101jkonts",
+            "amount": 0.5
+        }
+    ]
+}

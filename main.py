@@ -1,202 +1,164 @@
 from tkinter import *
+from tkinter import ttk
 import math
+import json
+from datetime import datetime
 
-logs = Tk()
-logs.title("Swedbank")
-logs.geometry("1000x600")
+root = Tk()
+root.title("Swedbank")
+root.geometry("390x844")  
+root.configure(bg='white')
 
-Konts =  {"Swedbank": 1000}
+
+Konts = {}
 Krājkonts = {}
-for account in Konts:
-    Krājkonts[account + " krājkonts"] = 0
-
 Transaction_history = []
+current_view = None
+views = {}
 
-def add_to_history(account, amount):
+def save_accounts():
+    data = {
+        "konts": Konts,
+        "krajkonts": Krājkonts,
+        "transactions": Transaction_history
+    }
+    with open("konti.txt", "w") as f:
+        json.dump(data, f, indent=4)
+
+def load_accounts():
+    global Konts, Krājkonts, Transaction_history
+    try:
+        with open("konti.txt", "r") as f:
+            data = json.load(f)
+            Konts = data["konts"]
+            Krājkonts = data["krajkonts"]
+            Transaction_history = data["transactions"]
+    except (FileNotFoundError, json.JSONDecodeError):
+        Konts = {"LV16HABA0551052320753": 22.20}
+        Krājkonts = {"LV59HABA0552060057732": 990.24}
+        Transaction_history = []
+        save_accounts()
+
+load_accounts()
+
+def add_transaction(account, amount, description=""):
     transaction_record = {
         "account": account,
         "amount": amount,
+        "date": datetime.now().strftime("%d/%m/%Y, %H:%M"),
+        "description": description
     }
-    Transaction_history.append(transaction_record)
-    update_history_display()
+    Transaction_history.insert(0, transaction_record)
+    save_accounts()
 
-def update_history_display():
-    history_text.delete(1.0, END)
-    for record in reversed(Transaction_history):
-        amount_text = f"{record['amount']:+.2f} €"
-        history_text.insert(END, f"{record['account']}: {amount_text}\n")
+class View(Frame):
+    def __init__(self, parent):
+        super().__init__(parent, bg='white')
+        self.pack_propagate(False)
+        self.grid_propagate(False)
 
-def transaction(konts):
-    krājkonts = konts + " krājkonts"
-    try:
-        transaction = float(transaction_entry.get())
+class OverviewView(View):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setup_ui()
 
-        if transaction < 0:
-            decimal = round(abs(transaction - math.floor(transaction)), 2)
-
-            if abs(transaction) > Konts[konts]:
-                status_label.config(text="Transaction failed: Insufficient funds", fg="red")
-                return
-
-            if decimal == 0:
-                Konts[konts] += transaction
-                add_to_history(konts, transaction)
-                transaction_value.config(text=f"{konts} {Konts[konts]} €")
-                status_label.config(text="Transaction successful", fg="green")
-
-            else:
-                Krājkonts[krājkonts] = round(Krājkonts[krājkonts] + decimal, 2)
-                Konts[konts] += (transaction - decimal)
-                add_to_history(konts, transaction)
-                add_to_history(konts, -decimal)
-                add_to_history(krājkonts, decimal)
-                transaction_value.config(text=f"{konts} {Konts[konts]} €")
-                krājkonts_value.config(text=f"{krājkonts} : {Krājkonts[krājkonts]} €")
-                status_label.config(text="Transaction successful", fg="green")
-
-        else:
-            Konts[konts] += transaction
-            add_to_history(konts, transaction)
-            transaction_value.config(text=f"{konts} {Konts[konts]} €")
-            status_label.config(text="Transaction successful", fg="green")
-            
-        transaction_entry.delete(0, END)
-    except ValueError:
-        status_label.config(text="Invalid amount entered", fg="red")
-
-def transfer():
-    from_account = transfer_from_var.get()
-    to_account = transfer_to_var.get()
-    try:
-        transfer_amount = float(transfer_entry.get())
+    def setup_ui(self):
+        header = Frame(self, bg='white')
+        header.pack(fill=X, padx=20, pady=(20,0))
         
-        if transfer_amount < 0:
-            status_label.config(text="Transfer failed: Amount must be positive", fg="red")
-            return
+        Label(header, text="Overview", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
         
-        if from_account == to_account:
-            status_label.config(text="Transfer failed: Cannot transfer to same account", fg="red")
-            return
+        account_frame = Frame(self, bg='white')
+        account_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        if from_account in Konts:
-            from_balance = Konts[from_account]
-        elif from_account in Krājkonts:
-            from_balance = Krājkonts[from_account]
-        else:
-            status_label.config(text="Transfer failed: Invalid source account", fg="red")
-            return
+        for acc_num, balance in Konts.items():
+            Label(account_frame, text=acc_num, font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
+            Label(account_frame, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
-        if to_account in Konts or to_account in Krājkonts:
-            pass
-        else:
-            status_label.config(text="Transfer failed: Invalid destination account", fg="red")
-            return
+        savings_frame = Frame(self, bg='white')
+        savings_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        if transfer_amount > from_balance:
-            status_label.config(text="Transfer failed: Insufficient funds", fg="red")
-            return
+        Label(savings_frame, text="Savings", font=('Arial', 16), bg='white').pack(anchor=W)
+        for acc_num, balance in Krājkonts.items():
+            Label(savings_frame, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
-        if from_account in Konts:
-            Konts[from_account] -= transfer_amount
-        else:
-            Krājkonts[from_account] -= transfer_amount
+        expenses_frame = Frame(self, bg='white')
+        expenses_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        if to_account in Konts:
-            Konts[to_account] += transfer_amount
-        else:
-            Krājkonts[to_account] += transfer_amount
+        exp_header = Frame(expenses_frame, bg='white')
+        exp_header.pack(fill=X)
+        Label(exp_header, text="Expenses", font=('Arial', 16), bg='white').pack(side=LEFT)
+        Label(exp_header, text="Detailed view", font=('Arial', 12), bg='white', fg='#007AFF').pack(side=RIGHT)
         
-        add_to_history(from_account, -transfer_amount)
-        add_to_history(to_account, transfer_amount)
+        Label(expenses_frame, text="This month", font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
+        Label(expenses_frame, text="189.22 EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+
+class AccountView(View):
+    def __init__(self, parent, account_number):
+        super().__init__(parent)
+        self.account_number = account_number
+        self.setup_ui()
+
+    def setup_ui(self):
+        header = Frame(self, bg='white')
+        header.pack(fill=X, padx=20, pady=(20,0))
         
-        transaction_value.config(text=f"{from_account} {from_balance - transfer_amount} €")
-        status_label.config(text=f"Transfer successful from {from_account} to {to_account}", fg="green")
-        update_history_display()
-    except ValueError:
-        status_label.config(text="Transfer failed: Invalid amount", fg="red")
-
-def update_transaction_mode(*args):
-    current_mode = transaction_type.get()
-    if current_mode == "Pārnest":
-        transfer_from_label.pack(pady=5)
-        transfer_from_dropdown.pack(pady=5)
-        transfer_to_label.pack(pady=5)
-        transfer_to_dropdown.pack(pady=5)
-        transfer_entry.pack(pady=10)
-        transaction_button.pack(pady=10)
+        Button(header, text="←", font=('Arial', 20), bg='white', bd=0, command=show_overview).pack(side=LEFT)
+        Label(header, text=self.account_number, font=('Arial', 14), bg='white').pack(side=LEFT, padx=10)
         
-        transaction_from_label.pack_forget()
-        transaction_from_dropdown.pack_forget()
-        transaction_entry.pack_forget()
-    else: 
-        transfer_from_label.pack_forget()
-        transfer_from_dropdown.pack_forget()
-        transfer_to_label.pack_forget()
-        transfer_to_dropdown.pack_forget()
-        transfer_entry.pack_forget()
+        balance_frame = Frame(self, bg='white')
+        balance_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        transaction_from_label.pack(pady=5)
-        transaction_from_dropdown.pack(pady=5)
-        transaction_entry.pack(pady=10)
-        transaction_button.pack(pady=10)
+        balance = Konts.get(self.account_number, 0)
+        Label(balance_frame, text=f"{balance:.2f}", font=('Arial', 36, 'bold'), bg='white').pack(anchor=W)
+        Label(balance_frame, text="EUR", font=('Arial', 16), bg='white').pack(anchor=W)
 
-main_frame = Frame(logs)
-main_frame.pack(fill="both", expand=True)
+        Button(self, text="Request", font=('Arial', 12), bg='#FFF5E6', fg='black', bd=0, padx=20, pady=10).pack(pady=20)
+        
+        Label(self, text="Transactions", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W, padx=20)
+        
+        transactions_frame = Frame(self, bg='white')
+        transactions_frame.pack(fill=X, padx=20)
+        
+        for transaction in Transaction_history:
+            if transaction["account"] == self.account_number:
+                trans_item = Frame(transactions_frame, bg='white')
+                trans_item.pack(fill=X, pady=5)
+                
+                Label(trans_item, text=transaction.get("description", "Transaction"), bg='white').pack(anchor=W)
+                amount = transaction["amount"]
+                color = "green" if amount > 0 else "red"
+                Label(trans_item, text=f"{amount:+.2f} EUR", fg=color, bg='white').pack(anchor=W)
 
-left_frame = Frame(main_frame)
-left_frame.pack(side="left", fill="both", expand=True)
-right_frame = Frame(main_frame)
-right_frame.pack(side="right", fill="both", expand=True)
+def show_overview():
+    global current_view
+    if current_view:
+        current_view.pack_forget()
+    current_view = OverviewView(root)
+    current_view.pack(fill=BOTH, expand=True)
 
+def show_account(account_number):
+    global current_view
+    if current_view:
+        current_view.pack_forget()
+    current_view = AccountView(root, account_number)
+    current_view.pack(fill=BOTH, expand=True)
 
-transaction_type = StringVar(logs)
-transaction_type.set("Transakcija")
-transaction_type_menu = OptionMenu(left_frame, transaction_type, "Pārnest", "Transakcija", command=update_transaction_mode)
-transaction_type_menu.pack(pady=5)
+nav_bar = Frame(root, bg='#F8F8F8', height=50)
+nav_bar.pack(side=BOTTOM, fill=X)
 
-transfer_from_label = Label(left_frame, text="No: ", font=("Arial", 12))
-transfer_from_label.pack_forget()
-transfer_from_var = StringVar(logs)
-transfer_from_dropdown = OptionMenu(left_frame, transfer_from_var, *list(Konts.keys()))
-transfer_from_dropdown.pack_forget()
+nav_items = [
+    ("Overview", "overview.png"),
+    ("Transfers", "transfers.png"),
+    ("Cards", "cards.png"),
+    ("Services", "services.png"),
+    ("Contacts", "contacts.png")
+]
 
-transfer_to_label = Label(left_frame, text="Uz: ", font=("Arial", 12))
-transfer_to_label.pack_forget()
-transfer_to_var = StringVar(logs)
-transfer_to_dropdown = OptionMenu(left_frame, transfer_to_var, *list(Konts.keys()), *list(Krājkonts.keys()))
-transfer_to_dropdown.pack_forget()
+for text, icon in nav_items:
+    btn = Button(nav_bar, text=text, bg='#F8F8F8', bd=0)
+    btn.pack(side=LEFT, expand=True, pady=10)
 
-transaction_from_label = Label(left_frame, text="No konta: ", font=("Arial", 12))
-transaction_from_label.pack(pady=5)
-transaction_from = StringVar(logs)
-transaction_from_dropdown = OptionMenu(left_frame, transaction_from, *list(Konts.keys()))
-transaction_from_dropdown.pack(pady=5)
+show_overview()
 
-transaction_entry = Entry(left_frame, font=("Arial", 16))
-transaction_entry.pack(pady=10)
-
-transfer_entry = Entry(left_frame, font=("Arial", 16))
-transfer_entry.pack_forget()
-
-transaction_button = Button(left_frame, text="Jauns darijums", font=("Arial", 16), command=lambda: transfer() if transaction_type.get() == "Pārnest" else transaction(transaction_from.get()))
-transaction_button.pack(pady=10)
-
-transaction_value = Label(right_frame, text="0 €", font=("Arial", 16))
-transaction_value.pack(pady=10)
-
-krājkonts_value = Label(right_frame, text="0 €", font=("Arial", 16))
-krājkonts_value.pack(pady=10)
-
-status_label = Label(left_frame, text="", font=("Arial", 12))
-status_label.pack(pady=10)
-
-history_frame = Frame(right_frame)
-history_frame.pack(fill="both", expand=True, pady=10)
-
-history_label = Label(history_frame, text="Transaction History", font=("Arial", 14, "bold"))
-history_label.pack()
-
-history_text = Text(history_frame, font=("Arial", 12), height=10, width=40)
-history_text.pack(pady=10)
-
-logs.mainloop()
+root.mainloop()
