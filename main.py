@@ -34,8 +34,8 @@ def load_accounts():
             Krājkonts = data["krajkonts"]
             Transaction_history = data["transactions"]
     except (FileNotFoundError, json.JSONDecodeError):
-        Konts = {"No account found": 0}
-        Krājkonts = {"No savings account found": 0}
+        Konts = {"LV16HABA0551052320753": 0}
+        Krājkonts = {"LV59HABA0552060057732": 0}
         Transaction_history = []
         save_accounts()
 
@@ -50,6 +50,13 @@ def add_transaction(account, amount, description=""):
     }
     Transaction_history.insert(0, transaction_record)
     save_accounts()
+
+def calculate_total_expenses():
+    total_expenses = 0
+    for transaction in Transaction_history:
+        if transaction["amount"] < 0:
+            total_expenses += abs(transaction["amount"])
+    return total_expenses
 
 class View(Frame):
     def __init__(self, parent):
@@ -107,7 +114,8 @@ class OverviewView(View):
         Label(exp_header, text="Detailed view", font=('Arial', 12), bg='white', fg='#007AFF').pack(side=RIGHT)
         
         Label(expenses_frame, text="This month", font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
-        Label(expenses_frame, text="0 EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+        total_expenses = calculate_total_expenses()
+        Label(expenses_frame, text=f"{total_expenses:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
 
 class AccountView(View):
     def __init__(self, parent, account_number):

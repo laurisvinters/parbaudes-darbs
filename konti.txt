@@ -1,77 +1,77 @@
 {
     "konts": {
-        "Swedbank": 1019.0
+        "LV16HABA0551052320753": 1019.0
     },
     "krajkonts": {
-        "Swedbank kr\u0101jkonts": 0.5
+        "LV59HABA0552060057732": 0.5
     },
     "transactions": [
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": 100.0,
             "date": "02/02/2025, 13:48",
-            "description": "Transfer from Swedbank kr\u0101jkonts"
+            "description": "Transfer from LV59HABA0552060057732"
         },
         {
-            "account": "Swedbank kr\u0101jkonts",
+            "account": "LV59HABA0552060057732",
             "amount": -100.0,
             "date": "02/02/2025, 13:48",
-            "description": "Transfer to Swedbank"
+            "description": "Transfer to LV16HABA0551052320753"
         },
         {
-            "account": "Swedbank kr\u0101jkonts",
+            "account": "LV59HABA0552060057732",
             "amount": 100.0,
             "date": "02/02/2025, 13:48",
-            "description": "Transfer from Swedbank"
+            "description": "Transfer from LV16HABA0551052320753"
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": -100.0,
             "date": "02/02/2025, 13:48",
-            "description": "Transfer to Swedbank kr\u0101jkonts"
+            "description": "Transfer to LV59HABA0552060057732"
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": 100.0,
             "date": "02/02/2025, 13:47",
-            "description": "Transfer from Swedbank kr\u0101jkonts"
+            "description": "Transfer from LV59HABA0552060057732"
         },
         {
-            "account": "Swedbank kr\u0101jkonts",
+            "account": "LV59HABA0552060057732",
             "amount": -100.0,
             "date": "02/02/2025, 13:47",
-            "description": "Transfer to Swedbank"
+            "description": "Transfer to LV16HABA0551052320753"
         },
         {
-            "account": "Swedbank kr\u0101jkonts",
+            "account": "LV59HABA0552060057732",
             "amount": 100.0,
             "date": "02/02/2025, 13:47",
-            "description": "Transfer from Swedbank"
+            "description": "Transfer from LV16HABA0551052320753"
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": -100.0,
             "date": "02/02/2025, 13:47",
-            "description": "Transfer to Swedbank kr\u0101jkonts"
+            "description": "Transfer to LV59HABA0552060057732"
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": 10.0
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": 20.0
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": -10.5
         },
         {
-            "account": "Swedbank",
+            "account": "LV16HABA0551052320753",
             "amount": -0.5
         },
         {
-            "account": "Swedbank kr\u0101jkonts",
+            "account": "LV59HABA0552060057732",
             "amount": 0.5
         }
     ]
