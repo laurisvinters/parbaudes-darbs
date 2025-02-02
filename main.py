@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
-import math
 import json
-from datetime import datetime
+import datetime
+import math
 
 root = Tk()
 root.title("Swedbank")
@@ -45,7 +45,7 @@ def add_transaction(account, amount, description=""):
     transaction_record = {
         "account": account,
         "amount": amount,
-        "date": datetime.now().strftime("%d/%m/%Y, %H:%M"),
+        "date": datetime.datetime.now().strftime("%d/%m/%Y, %H:%M"),
         "description": description
     }
     Transaction_history.insert(0, transaction_record)
@@ -74,48 +74,49 @@ class OverviewView(View):
         header.pack(fill=X, padx=20, pady=(20,0))
         
         Label(header, text="Overview", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+
+        accounts_frame = Frame(self, bg='white')
+        accounts_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        account_frame = Frame(self, bg='white')
-        account_frame.pack(fill=X, padx=20, pady=(20,0))
+        Label(accounts_frame, text="Accounts", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
-        for acc_num, balance in Konts.items():
-            account_button = Frame(account_frame, bg='white', cursor='hand2')
-            account_button.pack(fill=X, pady=5)
-            account_button.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
+        for account, balance in Konts.items():
+            account_frame = Frame(accounts_frame, bg='white', pady=10)
+            account_frame.pack(fill=X)
             
-            Label(account_button, text=acc_num, font=('Arial', 12), bg='white', fg='gray', cursor='hand2').pack(anchor=W)
-            Label(account_button, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white', cursor='hand2').pack(anchor=W)
+            account_label = Label(account_frame, text=account, font=('Arial', 14), 
+                                bg='white', cursor="hand2")
+            account_label.pack(anchor=W)
+            account_label.bind("<Button-1>", lambda e, acc=account: show_account(acc))
             
-            for widget in account_button.winfo_children():
-                widget.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
+            Label(account_frame, text=f"{balance:.2f} EUR", 
+                  font=('Arial', 14, 'bold'), bg='white').pack(anchor=W)
         
-        savings_frame = Frame(self, bg='white')
-        savings_frame.pack(fill=X, padx=20, pady=(20,0))
-        
-        Label(savings_frame, text="Savings", font=('Arial', 16), bg='white').pack(anchor=W)
-        
-        for acc_num, balance in Krājkonts.items():
-            savings_button = Frame(savings_frame, bg='white', cursor='hand2')
-            savings_button.pack(fill=X, pady=5)
-            savings_button.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
+        for account, balance in Krājkonts.items():
+            account_frame = Frame(accounts_frame, bg='white', pady=10)
+            account_frame.pack(fill=X)
             
-            Label(savings_button, text=acc_num, font=('Arial', 12), bg='white', fg='gray', cursor='hand2').pack(anchor=W)
-            Label(savings_button, text=f"{balance:.2f} EUR", font=('Arial', 16, 'bold'), bg='white', cursor='hand2').pack(anchor=W)
+            account_label = Label(account_frame, text=account, font=('Arial', 14), 
+                                bg='white', cursor="hand2")
+            account_label.pack(anchor=W)
+            account_label.bind("<Button-1>", lambda e, acc=account: show_account(acc))
             
-            for widget in savings_button.winfo_children():
-                widget.bind('<Button-1>', lambda e, acc=acc_num: show_account(acc))
-        
+            Label(account_frame, text=f"{balance:.2f} EUR", 
+                  font=('Arial', 14, 'bold'), bg='white').pack(anchor=W)
+
         expenses_frame = Frame(self, bg='white')
         expenses_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        exp_header = Frame(expenses_frame, bg='white')
-        exp_header.pack(fill=X)
-        Label(exp_header, text="Expenses", font=('Arial', 16), bg='white').pack(side=LEFT)
-        Label(exp_header, text="Detailed view", font=('Arial', 12), bg='white', fg='#007AFF').pack(side=RIGHT)
+        Label(expenses_frame, text="Expenses", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
-        Label(expenses_frame, text="This month", font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
-        total_expenses = calculate_total_expenses()
-        Label(expenses_frame, text=f"{total_expenses:.2f} EUR", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+        total_expenses = sum(abs(t['amount']) for t in Transaction_history if t['amount'] < 0)
+        Label(expenses_frame, text=f"{total_expenses:.2f} EUR", 
+              font=('Arial', 24, 'bold'), bg='white', fg='#FF6600').pack(anchor=W)
+        
+        detailed_label = Label(expenses_frame, text="Detailed view", 
+                             font=('Arial', 12), bg='white', fg='#FF6600', cursor="hand2")
+        detailed_label.pack(anchor=W)
+        detailed_label.bind("<Button-1>", lambda e: show_expenses())
 
 class AccountView(View):
     def __init__(self, parent, account_number):
@@ -136,8 +137,6 @@ class AccountView(View):
         balance = Konts.get(self.account_number, 0) if self.account_number in Konts else Krājkonts.get(self.account_number, 0)
         Label(balance_frame, text=f"{balance:.2f}", font=('Arial', 36, 'bold'), bg='white').pack(anchor=W)
         Label(balance_frame, text="EUR", font=('Arial', 16), bg='white').pack(anchor=W)
-
-        Button(self, text="Request", font=('Arial', 12), bg='#FFF5E6', fg='black', bd=0, padx=20, pady=10).pack(pady=20)
         
         Label(self, text="Transactions", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W, padx=20)
         
@@ -154,6 +153,72 @@ class AccountView(View):
                 color = "green" if amount > 0 else "red"
                 Label(trans_item, text=f"{amount:+.2f} EUR", fg=color, bg='white').pack(anchor=W)
 
+class ExpensesView(View):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setup_ui()
+
+    def setup_ui(self):
+        header = Frame(self, bg='white')
+        header.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(header, text="Expenses", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+        
+        expenses_frame = Frame(self, bg='white')
+        expenses_frame.pack(fill=BOTH, expand=True, padx=20, pady=(20,0))
+        
+        canvas = Canvas(expenses_frame, bg='white', highlightthickness=0)
+        scrollbar = ttk.Scrollbar(expenses_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = Frame(canvas, bg='white')
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        total_expenses = 0
+        for transaction in Transaction_history:
+            amount = transaction['amount']
+            if amount < 0:
+                total_expenses += abs(amount)
+                
+                transaction_frame = Frame(scrollable_frame, bg='white', pady=10)
+                transaction_frame.pack(fill=X)
+                
+                Label(transaction_frame, text=transaction['date'], 
+                      font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
+                      
+                description_text = transaction['description']
+                if description_text.startswith("Payment to "):
+                    description_text = description_text.replace("Payment to ", "")
+                    if ": " in description_text:
+                        account, desc = description_text.split(": ", 1)
+                        description_text = f"Payment to {account}\n{desc}"
+                
+                Label(transaction_frame, text=description_text,
+                      font=('Arial', 14), bg='white').pack(anchor=W)
+                      
+                amount_color = '#FF6600' if amount < 0 else 'green'
+                Label(transaction_frame, text=f"{abs(amount):.2f} EUR",
+                      font=('Arial', 14, 'bold'), bg='white', 
+                      fg=amount_color).pack(anchor=W)
+                      
+                ttk.Separator(scrollable_frame, orient='horizontal').pack(fill=X, pady=(5,0))
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        total_frame = Frame(self, bg='white')
+        total_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(total_frame, text="Total Expenses:",
+              font=('Arial', 16), bg='white').pack(side=LEFT)
+        Label(total_frame, text=f"{total_expenses:.2f} EUR",
+              font=('Arial', 16, 'bold'), bg='white', fg='#FF6600').pack(side=LEFT, padx=(10,0))
+
 class TransfersView(View):
     def __init__(self, parent):
         super().__init__(parent)
@@ -165,30 +230,59 @@ class TransfersView(View):
         
         Label(header, text="Transfers", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
 
-        from_frame = Frame(self, bg='white')
-        from_frame.pack(fill=X, padx=20, pady=(20,0))
+        operation_frame = Frame(self, bg='white')
+        operation_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(from_frame, text="From Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(operation_frame, text="Operation Type", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.operation_var = StringVar(self)
+        self.operation_var.set("Transfer")
+        operation_menu = OptionMenu(operation_frame, self.operation_var, "Transfer", "Transaction", 
+                                  command=self.update_operation_view)
+        operation_menu.config(bg='white', bd=1, relief=SOLID)
+        operation_menu.pack(fill=X, pady=(5,0))
+
+        self.transfer_frame = Frame(self, bg='white')
+        self.transfer_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(self.transfer_frame, text="From Account", font=('Arial', 14), bg='white').pack(anchor=W)
         self.from_var = StringVar(self)
         accounts = list(Konts.keys()) + list(Krājkonts.keys())
         if accounts:
             self.from_var.set(accounts[0])
-        from_menu = OptionMenu(from_frame, self.from_var, *accounts)
+        from_menu = OptionMenu(self.transfer_frame, self.from_var, *accounts)
         from_menu.config(bg='white', bd=1, relief=SOLID)
         from_menu.pack(fill=X, pady=(5,0))
 
-        to_frame = Frame(self, bg='white')
-        to_frame.pack(fill=X, padx=20, pady=(20,0))
-        
-        Label(to_frame, text="To Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transfer_frame, text="To Account", font=('Arial', 14), bg='white').pack(anchor=W)
         self.to_var = StringVar(self)
         if len(accounts) > 1:
             self.to_var.set(accounts[1])
         else:
             self.to_var.set(accounts[0])
-        to_menu = OptionMenu(to_frame, self.to_var, *accounts)
+        to_menu = OptionMenu(self.transfer_frame, self.to_var, *accounts)
         to_menu.config(bg='white', bd=1, relief=SOLID)
         to_menu.pack(fill=X, pady=(5,0))
+
+        self.transaction_frame = Frame(self, bg='white')
+        
+        Label(self.transaction_frame, text="Transaction Type", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.transaction_type_var = StringVar(self)
+        self.transaction_type_var.set("Income")
+        transaction_type_menu = OptionMenu(self.transaction_frame, self.transaction_type_var, "Income", "Expense")
+        transaction_type_menu.config(bg='white', bd=1, relief=SOLID)
+        transaction_type_menu.pack(fill=X, pady=(5,0))
+
+        Label(self.transaction_frame, text="Your Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.your_account_var = StringVar(self)
+        if accounts:
+            self.your_account_var.set(accounts[0])
+        your_account_menu = OptionMenu(self.transaction_frame, self.your_account_var, *accounts)
+        your_account_menu.config(bg='white', bd=1, relief=SOLID)
+        your_account_menu.pack(fill=X, pady=(5,0))
+
+        Label(self.transaction_frame, text="Other Party Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.account_entry = Entry(self.transaction_frame, font=('Arial', 16), bd=1, relief=SOLID)
+        self.account_entry.pack(fill=X, pady=(5,0))
 
         amount_frame = Frame(self, bg='white')
         amount_frame.pack(fill=X, padx=20, pady=(20,0))
@@ -197,51 +291,128 @@ class TransfersView(View):
         self.amount_entry = Entry(amount_frame, font=('Arial', 16), bd=1, relief=SOLID)
         self.amount_entry.pack(fill=X, pady=(5,0))
 
+        description_frame = Frame(self, bg='white')
+        description_frame.pack(fill=X, padx=20, pady=(20,0))
+        
+        Label(description_frame, text="Description", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.description_entry = Entry(description_frame, font=('Arial', 16), bd=1, relief=SOLID)
+        self.description_entry.pack(fill=X, pady=(5,0))
+
         button_frame = Frame(self, bg='white')
         button_frame.pack(fill=X, padx=20, pady=(20,0))
         
         self.status_label = Label(button_frame, text="", font=('Arial', 12), bg='white')
         self.status_label.pack(pady=(0,10))
         
-        transfer_button = Button(button_frame, text="Transfer", font=('Arial', 14), 
-                               bg='#FF6600', fg='white', bd=0,
-                               command=self.make_transfer)
-        transfer_button.pack(fill=X, ipady=10)
+        self.action_button = Button(button_frame, text="Transfer", font=('Arial', 14), 
+                                  bg='#FF6600', fg='white', bd=0,
+                                  command=self.process_operation)
+        self.action_button.pack(fill=X, ipady=10)
 
-    def make_transfer(self):
+    def update_operation_view(self, *args):
+        if self.operation_var.get() == "Transfer":
+            self.transaction_frame.pack_forget()
+            self.transfer_frame.pack(fill=X, padx=20, pady=(20,0))
+            self.action_button.config(text="Transfer")
+        else:
+            self.transfer_frame.pack_forget()
+            self.transaction_frame.pack(fill=X, padx=20, pady=(20,0))
+            self.action_button.config(text="Add Transaction")
+
+    def process_operation(self):
+        try:
+            amount = float(self.amount_entry.get())
+            description = self.description_entry.get()
+            
+            if self.operation_var.get() == "Transfer":
+                self.make_transfer(amount, description)
+            else:
+                self.make_transaction(amount, description)
+                
+        except ValueError:
+            self.status_label.config(text="Please enter a valid amount", fg='red')
+
+    def make_transfer(self, amount, description):
         from_acc = self.from_var.get()
         to_acc = self.to_var.get()
         
-        try:
-            amount = float(self.amount_entry.get())
-            if amount <= 0:
-                self.status_label.config(text="Please enter a positive amount", fg='red')
-                return
-                
-            if from_acc == to_acc:
-                self.status_label.config(text="Cannot transfer to the same account", fg='red')
-                return
+        if amount <= 0:
+            self.status_label.config(text="Please enter a positive amount", fg='red')
+            return
+            
+        if from_acc == to_acc:
+            self.status_label.config(text="Cannot transfer to the same account", fg='red')
+            return
 
-            from_dict = Konts if from_acc in Konts else Krājkonts
-            to_dict = Konts if to_acc in Konts else Krājkonts
+        from_dict = Konts if from_acc in Konts else Krājkonts
+        to_dict = Konts if to_acc in Konts else Krājkonts
+        
+        if from_dict[from_acc] < amount:
+            self.status_label.config(text="Insufficient funds", fg='red')
+            return
+        
+        from_dict[from_acc] -= amount
+        to_dict[to_acc] += amount
+        
+        add_transaction(from_acc, -amount, f"Transfer to {to_acc}: {description}")
+        add_transaction(to_acc, amount, f"Transfer from {from_acc}: {description}")
+        
+        self.amount_entry.delete(0, END)
+        self.description_entry.delete(0, END)
+        self.status_label.config(text="Transfer successful", fg='green')
+        
+        save_accounts()
+
+    def make_transaction(self, amount, description):
+        your_account = self.your_account_var.get()
+        other_account = self.account_entry.get().strip()
+        
+        if not other_account:
+            self.status_label.config(text="Please enter the other party's account number", fg='red')
+            return
             
-            if from_dict[from_acc] < amount:
-                self.status_label.config(text="Insufficient funds", fg='red')
-                return
+        if self.transaction_type_var.get() == "Expense":
+            amount = abs(amount)  
+            account_dict = Konts if your_account in Konts else Krājkonts
             
-            from_dict[from_acc] -= amount
-            to_dict[to_acc] += amount
-            
-            add_transaction(from_acc, -amount, f"Transfer to {to_acc}")
-            add_transaction(to_acc, amount, f"Transfer from {from_acc}")
-            
-            self.amount_entry.delete(0, END)
-            self.status_label.config(text="Transfer successful", fg='green')
-            
-            save_accounts()
-            
-        except ValueError:
-            self.status_label.config(text="Please enter a valid amount", fg='red')
+            if your_account in Konts:
+                rounded_amount = math.ceil(amount)
+                savings_amount = rounded_amount - amount
+        
+                if account_dict[your_account] < rounded_amount:
+                    self.status_label.config(text="Insufficient funds (including roundup)", fg='red')
+                    return
+                    
+                account_dict[your_account] -= rounded_amount
+                add_transaction(your_account, -amount, f"Payment to {other_account}: {description}")
+                add_transaction(other_account, amount, f"Payment from {your_account}: {description}")
+                
+                savings_account = list(Krājkonts.keys())[0]  
+                Krājkonts[savings_account] += savings_amount
+                add_transaction(your_account, -savings_amount, f"Roundup savings transfer")
+                add_transaction(savings_account, savings_amount, f"Roundup from expense to {other_account}")
+                
+            else:
+                if account_dict[your_account] < amount:
+                    self.status_label.config(text="Insufficient funds", fg='red')
+                    return
+                    
+                account_dict[your_account] -= amount
+                add_transaction(your_account, -amount, f"Payment to {other_account}: {description}")
+                add_transaction(other_account, amount, f"Payment from {your_account}: {description}")
+        else:
+            amount = abs(amount)
+            account_dict = Konts if your_account in Konts else Krājkonts
+            account_dict[your_account] += amount
+            add_transaction(your_account, amount, f"Income from {other_account}: {description}")
+            add_transaction(other_account, -amount, f"Payment to {your_account}: {description}")
+        
+        self.amount_entry.delete(0, END)
+        self.description_entry.delete(0, END)
+        self.account_entry.delete(0, END)
+        self.status_label.config(text="Transaction added successfully", fg='green')
+        
+        save_accounts()
 
 def show_overview():
     global current_view
@@ -255,6 +426,13 @@ def show_account(account_number):
     if current_view:
         current_view.pack_forget()
     current_view = AccountView(root, account_number)
+    current_view.pack(fill=BOTH, expand=True)
+
+def show_expenses():
+    global current_view
+    if current_view:
+        current_view.destroy()
+    current_view = ExpensesView(root)
     current_view.pack(fill=BOTH, expand=True)
 
 def show_transfers():

@@ -1,78 +1,76 @@
 {
     "konts": {
-        "LV16HABA0551052320753": 1019.0
+        "LV16HABA0551052320753": 48.5
     },
     "krajkonts": {
-        "LV59HABA0552060057732": 0.5
+        "LV59HABA0552060057732": 50.5
     },
     "transactions": [
         {
+            "account": "LV59HABA0552060057732",
+            "amount": 0.5,
+            "date": "02/02/2025, 14:14",
+            "description": "Roundup from expense to janka"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -0.5,
+            "date": "02/02/2025, 14:14",
+            "description": "Roundup savings transfer"
+        },
+        {
+            "account": "janka",
+            "amount": 0.5,
+            "date": "02/02/2025, 14:14",
+            "description": "Payment from LV16HABA0551052320753: test"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -0.5,
+            "date": "02/02/2025, 14:14",
+            "description": "Payment to janka: test"
+        },
+        {
+            "account": "jurka",
+            "amount": 0.5,
+            "date": "02/02/2025, 14:12",
+            "description": "Payment from LV16HABA0551052320753: test"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -0.5,
+            "date": "02/02/2025, 14:12",
+            "description": "Payment to jurka: test"
+        },
+        {
+            "account": "LV59HABA0552060057732",
+            "amount": 50.0,
+            "date": "02/02/2025, 14:11",
+            "description": "Transfer from LV16HABA0551052320753: test"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -50.0,
+            "date": "02/02/2025, 14:11",
+            "description": "Transfer to LV59HABA0552060057732: test"
+        },
+        {
+            "account": "juris",
+            "amount": -100.0,
+            "date": "02/02/2025, 14:11",
+            "description": "Payment to LV16HABA0551052320753: test"
+        },
+        {
             "account": "LV16HABA0551052320753",
             "amount": 100.0,
-            "date": "02/02/2025, 13:48",
-            "description": "Transfer from LV59HABA0552060057732"
+            "date": "02/02/2025, 14:11",
+            "description": "Income from juris: test"
         },
         {
-            "account": "LV59HABA0552060057732",
-            "amount": -100.0,
-            "date": "02/02/2025, 13:48",
-            "description": "Transfer to LV16HABA0551052320753"
-        },
-        {
-            "account": "LV59HABA0552060057732",
-            "amount": 100.0,
-            "date": "02/02/2025, 13:48",
-            "description": "Transfer from LV16HABA0551052320753"
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": -100.0,
-            "date": "02/02/2025, 13:48",
-            "description": "Transfer to LV59HABA0552060057732"
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": 100.0,
-            "date": "02/02/2025, 13:47",
-            "description": "Transfer from LV59HABA0552060057732"
-        },
-        {
-            "account": "LV59HABA0552060057732",
-            "amount": -100.0,
-            "date": "02/02/2025, 13:47",
-            "description": "Transfer to LV16HABA0551052320753"
-        },
-        {
-            "account": "LV59HABA0552060057732",
-            "amount": 100.0,
-            "date": "02/02/2025, 13:47",
-            "description": "Transfer from LV16HABA0551052320753"
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": -100.0,
-            "date": "02/02/2025, 13:47",
-            "description": "Transfer to LV59HABA0552060057732"
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": 10.0
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": 20.0
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": -10.5
-        },
-        {
-            "account": "LV16HABA0551052320753",
-            "amount": -0.5
-        },
-        {
-            "account": "LV59HABA0552060057732",
-            "amount": 0.5
+            "account": "juris",
+            "amount": 10.0,
+            "date": "02/02/2025, 14:08",
+            "description": "test"
         }
     ]
 }
