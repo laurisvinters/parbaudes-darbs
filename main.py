@@ -8,7 +8,7 @@ root = Tk()
 root.title("Swedbank")
 root.geometry("390x844")  
 root.configure(bg='white')
-
+root.resizable(False, False)
 
 Konts = {}
 Krājkonts = {}
@@ -79,7 +79,7 @@ class OverviewView(View):
         accounts_frame.pack(fill=X, padx=20, pady=(20,0))
         
         Label(accounts_frame, text="Accounts", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
-        
+
         for account, balance in Konts.items():
             account_frame = Frame(accounts_frame, bg='white', pady=10)
             account_frame.pack(fill=X)
@@ -170,14 +170,19 @@ class ExpensesView(View):
         canvas = Canvas(expenses_frame, bg='white', highlightthickness=0)
         scrollbar = ttk.Scrollbar(expenses_frame, orient="vertical", command=canvas.yview)
         scrollable_frame = Frame(canvas, bg='white')
+
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+            
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
         
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
+        # Configure canvas and scrollbar
+        canvas.pack(side=LEFT, fill=BOTH, expand=True, padx=(0, 2))
+        scrollbar.pack(side=RIGHT, fill=Y)
         
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        # Create window and configure scrolling
+        canvas.create_window((0, 0), window=scrollable_frame, anchor=NW)
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox(ALL)))
         
         total_expenses = 0
         for transaction in Transaction_history:
@@ -199,7 +204,7 @@ class ExpensesView(View):
                         description_text = f"Payment to {account}\n{desc}"
                 
                 Label(transaction_frame, text=description_text,
-                      font=('Arial', 14), bg='white').pack(anchor=W)
+                      font=('Arial', 14), bg='white', wraplength=330).pack(anchor=W)
                       
                 amount_color = '#FF6600' if amount < 0 else 'green'
                 Label(transaction_frame, text=f"{abs(amount):.2f} EUR",
@@ -207,9 +212,6 @@ class ExpensesView(View):
                       fg=amount_color).pack(anchor=W)
                       
                 ttk.Separator(scrollable_frame, orient='horizontal').pack(fill=X, pady=(5,0))
-        
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
         
         total_frame = Frame(self, bg='white')
         total_frame.pack(fill=X, padx=20, pady=(20,0))
@@ -388,9 +390,10 @@ class TransfersView(View):
                 add_transaction(other_account, amount, f"Payment from {your_account}: {description}")
                 
                 savings_account = list(Krājkonts.keys())[0]  
-                Krājkonts[savings_account] += savings_amount
-                add_transaction(your_account, -savings_amount, f"Roundup savings transfer")
-                add_transaction(savings_account, savings_amount, f"Roundup from expense to {other_account}")
+                if savings_amount != 0:
+                    Krājkonts[savings_account] += savings_amount
+                    add_transaction(your_account, -savings_amount, f"Roundup savings transfer")
+                    add_transaction(savings_account, savings_amount, f"Roundup from expense to {other_account}")
                 
             else:
                 if account_dict[your_account] < amount:
@@ -411,7 +414,6 @@ class TransfersView(View):
         self.description_entry.delete(0, END)
         self.account_entry.delete(0, END)
         self.status_label.config(text="Transaction added successfully", fg='green')
-        
         save_accounts()
 
 def show_overview():
@@ -448,9 +450,6 @@ nav_bar.pack(side=BOTTOM, fill=X)
 nav_items = [
     ("Overview", "overview.png", show_overview),
     ("Transfers", "transfers.png", show_transfers),
-    ("Cards", "cards.png", lambda: None),
-    ("Services", "services.png", lambda: None),
-    ("Contacts", "contacts.png", lambda: None)
 ]
 
 for text, icon, command in nav_items:

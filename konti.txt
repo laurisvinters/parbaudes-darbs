@@ -1,11 +1,59 @@
 {
     "konts": {
-        "LV16HABA0551052320753": 48.5
+        "LV16HABA0551052320753": 28.5
     },
     "krajkonts": {
         "LV59HABA0552060057732": 50.5
     },
     "transactions": [
+        {
+            "account": "sadad",
+            "amount": 10.0,
+            "date": "03/02/2025, 18:49",
+            "description": "Payment from LV16HABA0551052320753: testasd"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -10.0,
+            "date": "03/02/2025, 18:49",
+            "description": "Payment to sadad: testasd"
+        },
+        {
+            "account": "asdad",
+            "amount": -10.0,
+            "date": "03/02/2025, 18:48",
+            "description": "Payment to LV16HABA0551052320753: test"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": 10.0,
+            "date": "03/02/2025, 18:48",
+            "description": "Income from asdad: test"
+        },
+        {
+            "account": "LV59HABA0552060057732",
+            "amount": 0.0,
+            "date": "03/02/2025, 18:41",
+            "description": "Roundup from expense to hdgasdghjas"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -0.0,
+            "date": "03/02/2025, 18:41",
+            "description": "Roundup savings transfer"
+        },
+        {
+            "account": "hdgasdghjas",
+            "amount": 20.0,
+            "date": "03/02/2025, 18:41",
+            "description": "Payment from LV16HABA0551052320753: tests"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": -20.0,
+            "date": "03/02/2025, 18:41",
+            "description": "Payment to hdgasdghjas: tests"
+        },
         {
             "account": "LV59HABA0552060057732",
             "amount": 0.5,
