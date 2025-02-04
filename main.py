@@ -91,7 +91,7 @@ class OverviewView(View):
             
             Label(account_frame, text=f"{balance:.2f} EUR", 
                   font=('Arial', 14, 'bold'), bg='white').pack(anchor=W)
-        
+
         for account, balance in Krājkonts.items():
             account_frame = Frame(accounts_frame, bg='white', pady=10)
             account_frame.pack(fill=X)
@@ -103,6 +103,10 @@ class OverviewView(View):
             
             Label(account_frame, text=f"{balance:.2f} EUR", 
                   font=('Arial', 14, 'bold'), bg='white').pack(anchor=W)
+            
+            daily_interest = (balance * 0.025) / 365
+            Label(account_frame, text=f"Daily interest: {daily_interest:.3f} EUR", 
+                  font=('Arial', 12), bg='white', fg='#008800').pack(anchor=W)
 
         expenses_frame = Frame(self, bg='white')
         expenses_frame.pack(fill=X, padx=20, pady=(20,0))
@@ -176,11 +180,9 @@ class ExpensesView(View):
             
         canvas.bind_all("<MouseWheel>", _on_mousewheel)
         
-        # Configure canvas and scrollbar
         canvas.pack(side=LEFT, fill=BOTH, expand=True, padx=(0, 2))
         scrollbar.pack(side=RIGHT, fill=Y)
         
-        # Create window and configure scrolling
         canvas.create_window((0, 0), window=scrollable_frame, anchor=NW)
         scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox(ALL)))
         
