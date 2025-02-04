@@ -73,12 +73,12 @@ class OverviewView(View):
         header = Frame(self, bg='white')
         header.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(header, text="Overview", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+        Label(header, text="Pārskats", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
 
         accounts_frame = Frame(self, bg='white')
         accounts_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(accounts_frame, text="Accounts", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+        Label(accounts_frame, text="Konti", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
 
         for account, balance in Konts.items():
             account_frame = Frame(accounts_frame, bg='white', pady=10)
@@ -105,19 +105,19 @@ class OverviewView(View):
                   font=('Arial', 14, 'bold'), bg='white').pack(anchor=W)
             
             daily_interest = (balance * 0.025) / 365
-            Label(account_frame, text=f"Daily interest: {daily_interest:.3f} EUR", 
+            Label(account_frame, text=f"Procenta summa dienā: {daily_interest:.3f} EUR", 
                   font=('Arial', 12), bg='white', fg='#008800').pack(anchor=W)
 
         expenses_frame = Frame(self, bg='white')
         expenses_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(expenses_frame, text="Expenses", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
+        Label(expenses_frame, text="Izmaksas", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
         total_expenses = sum(abs(t['amount']) for t in Transaction_history if t['amount'] < 0)
         Label(expenses_frame, text=f"{total_expenses:.2f} EUR", 
               font=('Arial', 24, 'bold'), bg='white', fg='#FF6600').pack(anchor=W)
         
-        detailed_label = Label(expenses_frame, text="Detailed view", 
+        detailed_label = Label(expenses_frame, text="Skatīt vairāk", 
                              font=('Arial', 12), bg='white', fg='#FF6600', cursor="hand2")
         detailed_label.pack(anchor=W)
         detailed_label.bind("<Button-1>", lambda e: show_expenses())
@@ -142,7 +142,7 @@ class AccountView(View):
         Label(balance_frame, text=f"{balance:.2f}", font=('Arial', 36, 'bold'), bg='white').pack(anchor=W)
         Label(balance_frame, text="EUR", font=('Arial', 16), bg='white').pack(anchor=W)
         
-        Label(self, text="Transactions", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W, padx=20)
+        Label(self, text="Transakcijas", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W, padx=20)
         
         transactions_frame = Frame(self, bg='white')
         transactions_frame.pack(fill=X, padx=20)
@@ -152,7 +152,7 @@ class AccountView(View):
                 trans_item = Frame(transactions_frame, bg='white')
                 trans_item.pack(fill=X, pady=5)
                 
-                Label(trans_item, text=transaction.get("description", "Transaction"), bg='white').pack(anchor=W)
+                Label(trans_item, text=transaction.get("Skatīt vairāk", "Transakcijas"), bg='white').pack(anchor=W)
                 amount = transaction["amount"]
                 color = "green" if amount > 0 else "red"
                 Label(trans_item, text=f"{amount:+.2f} EUR", fg=color, bg='white').pack(anchor=W)
@@ -166,7 +166,7 @@ class ExpensesView(View):
         header = Frame(self, bg='white')
         header.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(header, text="Expenses", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+        Label(header, text="Izmaksas", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
         
         expenses_frame = Frame(self, bg='white')
         expenses_frame.pack(fill=BOTH, expand=True, padx=20, pady=(20,0))
@@ -198,12 +198,12 @@ class ExpensesView(View):
                 Label(transaction_frame, text=transaction['date'], 
                       font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
                       
-                description_text = transaction['description']
-                if description_text.startswith("Payment to "):
-                    description_text = description_text.replace("Payment to ", "")
+                description_text = transaction['Skatīt vairāk']
+                if description_text.startswith("Maksājums uz "):
+                    description_text = description_text.replace("Maksājums uz ", "")
                     if ": " in description_text:
                         account, desc = description_text.split(": ", 1)
-                        description_text = f"Payment to {account}\n{desc}"
+                        description_text = f"Maksājums uz {account}\n{desc}"
                 
                 Label(transaction_frame, text=description_text,
                       font=('Arial', 14), bg='white', wraplength=330).pack(anchor=W)
@@ -218,7 +218,7 @@ class ExpensesView(View):
         total_frame = Frame(self, bg='white')
         total_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(total_frame, text="Total Expenses:",
+        Label(total_frame, text="Kopējie tēriņi:",
               font=('Arial', 16), bg='white').pack(side=LEFT)
         Label(total_frame, text=f"{total_expenses:.2f} EUR",
               font=('Arial', 16, 'bold'), bg='white', fg='#FF6600').pack(side=LEFT, padx=(10,0))
@@ -232,15 +232,15 @@ class TransfersView(View):
         header = Frame(self, bg='white')
         header.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(header, text="Transfers", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
+        Label(header, text="Pārskaitijumi", font=('Arial', 24, 'bold'), bg='white', fg='black').pack(anchor=W)
 
         operation_frame = Frame(self, bg='white')
         operation_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(operation_frame, text="Operation Type", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(operation_frame, text="Darijuma veids", font=('Arial', 14), bg='white').pack(anchor=W)
         self.operation_var = StringVar(self)
-        self.operation_var.set("Transfer")
-        operation_menu = OptionMenu(operation_frame, self.operation_var, "Transfer", "Transaction", 
+        self.operation_var.set("Pārskaitīt")
+        operation_menu = OptionMenu(operation_frame, self.operation_var, "Pārskaitīt", "Transakcija", 
                                   command=self.update_operation_view)
         operation_menu.config(bg='white', bd=1, relief=SOLID)
         operation_menu.pack(fill=X, pady=(5,0))
@@ -248,7 +248,7 @@ class TransfersView(View):
         self.transfer_frame = Frame(self, bg='white')
         self.transfer_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(self.transfer_frame, text="From Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transfer_frame, text="No Konta", font=('Arial', 14), bg='white').pack(anchor=W)
         self.from_var = StringVar(self)
         accounts = list(Konts.keys()) + list(Krājkonts.keys())
         if accounts:
@@ -257,7 +257,7 @@ class TransfersView(View):
         from_menu.config(bg='white', bd=1, relief=SOLID)
         from_menu.pack(fill=X, pady=(5,0))
 
-        Label(self.transfer_frame, text="To Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transfer_frame, text="Uz kontu", font=('Arial', 14), bg='white').pack(anchor=W)
         self.to_var = StringVar(self)
         if len(accounts) > 1:
             self.to_var.set(accounts[1])
@@ -269,14 +269,14 @@ class TransfersView(View):
 
         self.transaction_frame = Frame(self, bg='white')
         
-        Label(self.transaction_frame, text="Transaction Type", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transaction_frame, text="Darijuma veids", font=('Arial', 14), bg='white').pack(anchor=W)
         self.transaction_type_var = StringVar(self)
-        self.transaction_type_var.set("Income")
-        transaction_type_menu = OptionMenu(self.transaction_frame, self.transaction_type_var, "Income", "Expense")
+        self.transaction_type_var.set("Ienākums")
+        transaction_type_menu = OptionMenu(self.transaction_frame, self.transaction_type_var, "Ienākums", "Izmaksa")
         transaction_type_menu.config(bg='white', bd=1, relief=SOLID)
         transaction_type_menu.pack(fill=X, pady=(5,0))
 
-        Label(self.transaction_frame, text="Your Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transaction_frame, text="Tavs Konts", font=('Arial', 14), bg='white').pack(anchor=W)
         self.your_account_var = StringVar(self)
         if accounts:
             self.your_account_var.set(accounts[0])
@@ -284,21 +284,21 @@ class TransfersView(View):
         your_account_menu.config(bg='white', bd=1, relief=SOLID)
         your_account_menu.pack(fill=X, pady=(5,0))
 
-        Label(self.transaction_frame, text="Other Party Account", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(self.transaction_frame, text="Saņēmējs", font=('Arial', 14), bg='white').pack(anchor=W)
         self.account_entry = Entry(self.transaction_frame, font=('Arial', 16), bd=1, relief=SOLID)
         self.account_entry.pack(fill=X, pady=(5,0))
 
         amount_frame = Frame(self, bg='white')
         amount_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(amount_frame, text="Amount (EUR)", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(amount_frame, text="Daudzums (EUR)", font=('Arial', 14), bg='white').pack(anchor=W)
         self.amount_entry = Entry(amount_frame, font=('Arial', 16), bd=1, relief=SOLID)
         self.amount_entry.pack(fill=X, pady=(5,0))
 
         description_frame = Frame(self, bg='white')
         description_frame.pack(fill=X, padx=20, pady=(20,0))
         
-        Label(description_frame, text="Description", font=('Arial', 14), bg='white').pack(anchor=W)
+        Label(description_frame, text="Apraksts", font=('Arial', 14), bg='white').pack(anchor=W)
         self.description_entry = Entry(description_frame, font=('Arial', 16), bd=1, relief=SOLID)
         self.description_entry.pack(fill=X, pady=(5,0))
 
@@ -308,62 +308,62 @@ class TransfersView(View):
         self.status_label = Label(button_frame, text="", font=('Arial', 12), bg='white')
         self.status_label.pack(pady=(0,10))
         
-        self.action_button = Button(button_frame, text="Transfer", font=('Arial', 14), 
+        self.action_button = Button(button_frame, text="Pārskaitīt", font=('Arial', 14), 
                                   bg='#FF6600', fg='white', bd=0,
                                   command=self.process_operation)
         self.action_button.pack(fill=X, ipady=10)
 
     def update_operation_view(self, *args):
-        if self.operation_var.get() == "Transfer":
+        if self.operation_var.get() == "Pārskaitīt":
             self.transaction_frame.pack_forget()
             self.transfer_frame.pack(fill=X, padx=20, pady=(20,0))
-            self.action_button.config(text="Transfer")
+            self.action_button.config(text="Pārskaitīt")
         else:
             self.transfer_frame.pack_forget()
             self.transaction_frame.pack(fill=X, padx=20, pady=(20,0))
-            self.action_button.config(text="Add Transaction")
+            self.action_button.config(text="Pievienot transakciju")
 
     def process_operation(self):
         try:
             amount = float(self.amount_entry.get())
             description = self.description_entry.get()
             
-            if self.operation_var.get() == "Transfer":
+            if self.operation_var.get() == "Pārskaitīt":
                 self.make_transfer(amount, description)
             else:
                 self.make_transaction(amount, description)
                 
         except ValueError:
-            self.status_label.config(text="Please enter a valid amount", fg='red')
+            self.status_label.config(text="Ievadi derīgu skaitli", fg='red')
 
     def make_transfer(self, amount, description):
         from_acc = self.from_var.get()
         to_acc = self.to_var.get()
         
         if amount <= 0:
-            self.status_label.config(text="Please enter a positive amount", fg='red')
+            self.status_label.config(text="Ievadi pozitīvu skaitli", fg='red')
             return
             
         if from_acc == to_acc:
-            self.status_label.config(text="Cannot transfer to the same account", fg='red')
+            self.status_label.config(text="Nevar pārskaitīt uz to pašu kontu", fg='red')
             return
 
         from_dict = Konts if from_acc in Konts else Krājkonts
         to_dict = Konts if to_acc in Konts else Krājkonts
         
         if from_dict[from_acc] < amount:
-            self.status_label.config(text="Insufficient funds", fg='red')
+            self.status_label.config(text="Nepietiekami līdzekļi", fg='red')
             return
         
         from_dict[from_acc] -= amount
         to_dict[to_acc] += amount
         
-        add_transaction(from_acc, -amount, f"Transfer to {to_acc}: {description}")
-        add_transaction(to_acc, amount, f"Transfer from {from_acc}: {description}")
+        add_transaction(from_acc, -amount, f"Pārskaita uz {to_acc}: {description}")
+        add_transaction(to_acc, amount, f"Pārskaita no {from_acc}: {description}")
         
         self.amount_entry.delete(0, END)
         self.description_entry.delete(0, END)
-        self.status_label.config(text="Transfer successful", fg='green')
+        self.status_label.config(text="Pārskaitijums ir veiksmīgs", fg='green')
         
         save_accounts()
 
@@ -372,10 +372,10 @@ class TransfersView(View):
         other_account = self.account_entry.get().strip()
         
         if not other_account:
-            self.status_label.config(text="Please enter the other party's account number", fg='red')
+            self.status_label.config(text="Ievadi saņēmēja nosaukumu", fg='red')
             return
             
-        if self.transaction_type_var.get() == "Expense":
+        if self.transaction_type_var.get() == "Izdevmi":
             amount = abs(amount)  
             account_dict = Konts if your_account in Konts else Krājkonts
             
@@ -384,38 +384,38 @@ class TransfersView(View):
                 savings_amount = rounded_amount - amount
         
                 if account_dict[your_account] < rounded_amount:
-                    self.status_label.config(text="Insufficient funds (including roundup)", fg='red')
+                    self.status_label.config(text="Nepietiekami līdzekļi (ieskaitot apaļošanu)", fg='red')
                     return
                     
                 account_dict[your_account] -= rounded_amount
-                add_transaction(your_account, -amount, f"Payment to {other_account}: {description}")
-                add_transaction(other_account, amount, f"Payment from {your_account}: {description}")
+                add_transaction(your_account, -amount, f"Maksājums uz {other_account}: {description}")
+                add_transaction(other_account, amount, f"Maksājums no {your_account}: {description}")
                 
                 savings_account = list(Krājkonts.keys())[0]  
                 if savings_amount != 0:
                     Krājkonts[savings_account] += savings_amount
-                    add_transaction(your_account, -savings_amount, f"Roundup savings transfer")
-                    add_transaction(savings_account, savings_amount, f"Roundup from expense to {other_account}")
+                    add_transaction(your_account, -savings_amount, f"Apaļošanas pārskaitijums")
+                    add_transaction(savings_account, savings_amount, f"Apaļošana no {other_account}")
                 
             else:
                 if account_dict[your_account] < amount:
-                    self.status_label.config(text="Insufficient funds", fg='red')
+                    self.status_label.config(text="Nepietiekami līdzekļi", fg='red')
                     return
                     
                 account_dict[your_account] -= amount
-                add_transaction(your_account, -amount, f"Payment to {other_account}: {description}")
-                add_transaction(other_account, amount, f"Payment from {your_account}: {description}")
+                add_transaction(your_account, -amount, f"Maksājums uz {other_account}: {description}")
+                add_transaction(other_account, amount, f"Maksājums no {your_account}: {description}")
         else:
             amount = abs(amount)
             account_dict = Konts if your_account in Konts else Krājkonts
             account_dict[your_account] += amount
-            add_transaction(your_account, amount, f"Income from {other_account}: {description}")
-            add_transaction(other_account, -amount, f"Payment to {your_account}: {description}")
+            add_transaction(your_account, amount, f"Ienākums no {other_account}: {description}")
+            add_transaction(other_account, -amount, f"Maksājums uz {your_account}: {description}")
         
         self.amount_entry.delete(0, END)
         self.description_entry.delete(0, END)
         self.account_entry.delete(0, END)
-        self.status_label.config(text="Transaction added successfully", fg='green')
+        self.status_label.config(text="Transakcija pievienota veiksmīgi", fg='green')
         save_accounts()
 
 def show_overview():
