@@ -6,7 +6,7 @@ import math
 
 root = Tk()
 root.title("Swedbank")
-root.geometry("390x844")  
+root.geometry("402x874")  
 root.configure(bg='white')
 root.resizable(False, False)
 
@@ -16,7 +16,7 @@ Transaction_history = []
 current_view = None
 views = {}
 
-def save_accounts():
+def saglabat_kontu():
     data = {
         "konts": Konts,
         "krajkonts": Krājkonts,
@@ -37,7 +37,7 @@ def load_accounts():
         Konts = {"LV16HABA0551052320753": 0}
         Krājkonts = {"LV59HABA0552060057732": 0}
         Transaction_history = []
-        save_accounts()
+        saglabat_kontu()
 
 load_accounts()
 
@@ -49,7 +49,7 @@ def add_transaction(account, amount, description=""):
         "description": description
     }
     Transaction_history.insert(0, transaction_record)
-    save_accounts()
+    saglabat_kontu()
 
 def calculate_total_expenses():
     total_expenses = 0
@@ -113,7 +113,9 @@ class OverviewView(View):
         
         Label(expenses_frame, text="Izmaksas", font=('Arial', 16, 'bold'), bg='white').pack(anchor=W)
         
-        total_expenses = sum(abs(t['amount']) for t in Transaction_history if t['amount'] < 0)
+        user_accounts = list(Konts.keys()) + list(Krājkonts.keys())
+        total_expenses = sum(abs(t['amount']) for t in Transaction_history 
+                           if t['amount'] < 0 and t['account'] in user_accounts)
         Label(expenses_frame, text=f"{total_expenses:.2f} EUR", 
               font=('Arial', 24, 'bold'), bg='white', fg='#FF6600').pack(anchor=W)
         
@@ -152,7 +154,7 @@ class AccountView(View):
                 trans_item = Frame(transactions_frame, bg='white')
                 trans_item.pack(fill=X, pady=5)
                 
-                Label(trans_item, text=transaction.get("Skatīt vairāk", "Transakcijas"), bg='white').pack(anchor=W)
+                Label(trans_item, text=transaction.get("description", "Transakcijas"), bg='white').pack(anchor=W)
                 amount = transaction["amount"]
                 color = "green" if amount > 0 else "red"
                 Label(trans_item, text=f"{amount:+.2f} EUR", fg=color, bg='white').pack(anchor=W)
@@ -187,9 +189,12 @@ class ExpensesView(View):
         scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox(ALL)))
         
         total_expenses = 0
+        user_accounts = list(Konts.keys()) + list(Krājkonts.keys())
+        
         for transaction in Transaction_history:
             amount = transaction['amount']
-            if amount < 0:
+            account = transaction['account']
+            if amount < 0 and account in user_accounts:  # Only show expenses from user's accounts
                 total_expenses += abs(amount)
                 
                 transaction_frame = Frame(scrollable_frame, bg='white', pady=10)
@@ -198,20 +203,15 @@ class ExpensesView(View):
                 Label(transaction_frame, text=transaction['date'], 
                       font=('Arial', 12), bg='white', fg='gray').pack(anchor=W)
                       
-                description_text = transaction['Skatīt vairāk']
-                if description_text.startswith("Maksājums uz "):
-                    description_text = description_text.replace("Maksājums uz ", "")
-                    if ": " in description_text:
-                        account, desc = description_text.split(": ", 1)
-                        description_text = f"Maksājums uz {account}\n{desc}"
-                
+                description_text = transaction['description']
+                if not description_text:
+                    description_text = "Transakcija"
+                    
                 Label(transaction_frame, text=description_text,
-                      font=('Arial', 14), bg='white', wraplength=330).pack(anchor=W)
+                      font=('Arial', 14), bg='white').pack(anchor=W)
                       
-                amount_color = '#FF6600' if amount < 0 else 'green'
-                Label(transaction_frame, text=f"{abs(amount):.2f} EUR",
-                      font=('Arial', 14, 'bold'), bg='white', 
-                      fg=amount_color).pack(anchor=W)
+                Label(transaction_frame, text=f"{amount:.2f} EUR",
+                      font=('Arial', 14, 'bold'), bg='white', fg='red').pack(anchor=W)
                       
                 ttk.Separator(scrollable_frame, orient='horizontal').pack(fill=X, pady=(5,0))
         
@@ -272,7 +272,8 @@ class TransfersView(View):
         Label(self.transaction_frame, text="Darijuma veids", font=('Arial', 14), bg='white').pack(anchor=W)
         self.transaction_type_var = StringVar(self)
         self.transaction_type_var.set("Ienākums")
-        transaction_type_menu = OptionMenu(self.transaction_frame, self.transaction_type_var, "Ienākums", "Izmaksa")
+        transaction_type_menu = OptionMenu(self.transaction_frame, self.transaction_type_var, "Ienākums", "Izmaksa",
+                                         command=lambda *args: self.update_recipient_label())
         transaction_type_menu.config(bg='white', bd=1, relief=SOLID)
         transaction_type_menu.pack(fill=X, pady=(5,0))
 
@@ -284,7 +285,8 @@ class TransfersView(View):
         your_account_menu.config(bg='white', bd=1, relief=SOLID)
         your_account_menu.pack(fill=X, pady=(5,0))
 
-        Label(self.transaction_frame, text="Saņēmējs", font=('Arial', 14), bg='white').pack(anchor=W)
+        self.recipient_label = Label(self.transaction_frame, text="Sūta No", font=('Arial', 14), bg='white')
+        self.recipient_label.pack(anchor=W)
         self.account_entry = Entry(self.transaction_frame, font=('Arial', 16), bd=1, relief=SOLID)
         self.account_entry.pack(fill=X, pady=(5,0))
 
@@ -308,9 +310,7 @@ class TransfersView(View):
         self.status_label = Label(button_frame, text="", font=('Arial', 12), bg='white')
         self.status_label.pack(pady=(0,10))
         
-        self.action_button = Button(button_frame, text="Pārskaitīt", font=('Arial', 14), 
-                                  bg='#FF6600', fg='white', bd=0,
-                                  command=self.process_operation)
+        self.action_button = Button(button_frame, text="Pārskaitīt", font=('Arial', 14), bg='#FFFFFF', fg='black', bd=0, command=self.process_operation)
         self.action_button.pack(fill=X, ipady=10)
 
     def update_operation_view(self, *args):
@@ -322,6 +322,12 @@ class TransfersView(View):
             self.transfer_frame.pack_forget()
             self.transaction_frame.pack(fill=X, padx=20, pady=(20,0))
             self.action_button.config(text="Pievienot transakciju")
+
+    def update_recipient_label(self):
+        if self.transaction_type_var.get() == "Ienākums":
+            self.recipient_label.config(text="Sūta No")
+        else:
+            self.recipient_label.config(text="Saņēmējs")
 
     def process_operation(self):
         try:
@@ -450,8 +456,8 @@ nav_bar = Frame(root, bg='#F8F8F8', height=50)
 nav_bar.pack(side=BOTTOM, fill=X)
 
 nav_items = [
-    ("Overview", "overview.png", show_overview),
-    ("Transfers", "transfers.png", show_transfers),
+    ("Pārskats", "overview.png", show_overview),
+    ("Jauns darijums", "transfers.png", show_transfers),
 ]
 
 for text, icon, command in nav_items:
