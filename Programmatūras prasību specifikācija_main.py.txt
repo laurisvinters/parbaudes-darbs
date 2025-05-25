@@ -1,0 +1,66 @@
+Programmatūras Prasību Specifikācija
+Lietotnes Nosaukums: Swedbank Bankas Lietotne
+Autors: Laris Vinters, Nauris Šleinis
+Atrašanās vieta: Valmiera, 2024
+
+Saturs
+Ievads
+Vispārīgs Apraksts
+Konkrētas Prasības
+Saskarnes Prasības
+Projekta Ierobežojumi
+Atsauces
+1. Ievads
+1.1 Nolūks
+Šī aplikācija ir izstrādāta, lai pārvaldītu lietotāju kontus, darījumus un nodrošinātu dažādus skatus finanšu operācijām.
+
+1.2 Darbības Joma
+Lietotne ir darbvirsmas bankas risinājums, kas ļauj lietotājiem pārvaldīt savus kontus, skatīt darījumu vēsturi un veikt
+operācijas, piemēram, pārskaitījumus un izdevumu izsekošanu.
+
+2. Vispārīgs Apraksts
+2.1 Produkta Perspektīva
+Lietotne ir neatkarīga darbvirsmas lietotne ar grafisko lietotāja saskarni, kas veidota, izmantojot Tkinter.
+Tā nodrošina funkcionalitāti kontu pārvaldībai, darījumu vēstures skatīšanai un dažādām finanšu operācijām.
+
+2.2 Produkta Funkcijas
+
+Kontu pārvaldība (krājkonti un norēķinu konti).
+Darījumu vēstures skatīšana un pārvaldība.
+Finanšu operācijas, piemēram, pārskaitījumi un izdevumu izsekošana.
+Lietotāja saskarnes skati pārskatiem, kontiem, izdevumiem un pārskaitījumiem.
+2.3 Lietotāja Raksturiezīmes
+Lietotne ir paredzēta lietotājiem, kuri pārvalda savas personīgās bankas operācijas un nepieciešams darbvirsmas risinājums finanšu pārvaldībai.
+
+2.4 Vispārējie Ierobežojumi
+Lietotne ir izstrādāta darbvirsmas vidēm ar Python un Tkinter atbalstu.
+
+2.5 Pieņēmumi un Atkarības
+
+Lietotājiem ir pamatzināšanas par bankas operācijām.
+Lietotne pieņem piekļuvi failu sistēmai kontu datu saglabāšanai un ielādēšanai.
+3. Konkrētas Prasības
+3.1 Funkcionālās Prasības
+
+Kontu Pārvaldība: Lietotāji var skatīt un pārvaldīt savus krājkontus un norēķinu kontus.
+Darījumu Apstrāde: Lietotāji var pievienot darījumus ar tādām detaļām kā summa, datums un apraksts.
+Finanšu Operācijas: Lietotāji var veikt pārskaitījumus un izsekot izdevumus, izmantojot īpašus skatus.
+3.2 Ne-funkcionālās Prasības
+
+Lietojamība: Lietotnei jābūt lietotājam draudzīgai un intuitīvai.
+Veiktspēja: Operācijām, piemēram, kontu saglabāšanai un ielādēšanai, jābūt ātrām un efektīvām.
+4. Saskarnes Prasības
+4.1 Lietotāja Saskarnes
+
+Pārskata Skats: Parāda visu kontu un darījumu kopsavilkumu.
+Konta Skats: Sniedz detalizētu informāciju par konkrētu kontu.
+Izdevumu Skats: Ļauj lietotājiem izsekot un pārvaldīt izdevumus.
+Pārskaitījumu Skats: Atvieglo finanšu pārskaitījumus starp kontiem.
+5. Projekta Ierobežojumi
+Lietotne jāizstrādā, izmantojot Python un Tkinter.
+
+6. Atsauces
+w3schools.com
+geeksforgeeks.com
+stackoverflow.com
+chatgpt

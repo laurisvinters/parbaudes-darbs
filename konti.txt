@@ -1,11 +1,23 @@
 {
     "konts": {
-        "LV16HABA0551052320753": 0.0
+        "LV16HABA0551052320753": 100.0
     },
     "krajkonts": {
         "LV59HABA0552060057732": 100.0
     },
     "transactions": [
+        {
+            "account": "Test 2",
+            "amount": -100.0,
+            "date": "25/05/2025, 13:56",
+            "description": "Maks\u0101jums uz LV16HABA0551052320753: Jauns darijums"
+        },
+        {
+            "account": "LV16HABA0551052320753",
+            "amount": 100.0,
+            "date": "25/05/2025, 13:56",
+            "description": "Ien\u0101kums no Test 2: Jauns darijums"
+        },
         {
             "account": "LV59HABA0552060057732",
             "amount": 100.0,
